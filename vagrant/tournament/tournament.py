@@ -70,8 +70,8 @@ def playerStandings():
     c = DB.cursor()
     c.execute(
     "select p.player_id as id, p.player_name as name, count(case when m.winner_id = p.player_id then 1 end) as wins, count(m.match_id) as matches" +
-    " from players as p, matches as m" +
-    " where p.player_id = m.winner_id or p.player_id = m.loser_id" +
+    " from players as p left join matches as m" +
+    " on p.player_id = m.winner_id or p.player_id = m.loser_id" +
     " group by p.player_id order by wins desc")
     ans = c.fetchall()
     DB.commit()
