@@ -69,10 +69,10 @@ def playerStandings():
     DB = connect()
     c = DB.cursor()
     c.execute(
-    "select p.player_id as id, p.player_name as name, count(case when m.winner_id = p.player_id then 1 end) as wins, count(m.match_id) as matches" +
-    " from players as p left join matches as m" +
-    " on p.player_id = m.winner_id or p.player_id = m.loser_id" +
-    " group by p.player_id order by wins desc")
+    """select p.player_id as id, p.player_name as name, count(case when m.winner_id = p.player_id then 1 end) as wins, count(m.match_id) as matches
+    from players as p left join matches as m
+    on p.player_id = m.winner_id or p.player_id = m.loser_id
+    group by p.player_id order by wins desc""")
     ans = c.fetchall()
     DB.commit()
     DB.close()
@@ -108,10 +108,37 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    # standing = playerStandings()
+    # for i in range(len(standing)):
+    #     for j in range(len(standing[0])):
+    #         print standing[i][j],
+    #     print
 
+    DB = connect()
+    c = DB.cursor()
+    c.execute(
+    """select subq1.player_id as id1, subq1.player_name as name1,
+     subq2.player_id as id2, subq2.player_name as name2
+     from (select p.player_id as player_id, p.player_name as player_name,
+     count(case when m.winner_id = p.player_id then 1 end) as wins
+     from players as p left join matches as m
+     on p.player_id = m.winner_id or p.player_id = m.loser_id
+     group by p.player_id order by wins) as subq1,
+     (select p.player_id as player_id, p.player_name as player_name,
+     count(case when m.winner_id = p.player_id then 1 end) as wins
+     from players as p left join matches as m
+     on p.player_id = m.winner_id or p.player_id = m.loser_id
+     group by p.player_id order by wins) as subq2 
+     where subq1.player_id < subq2.player_id and
+     subq1.wins = subq2.wins""")
+    ans = c.fetchall()
+    c.e
+    DB.commit()
+    DB.close()
+    return ans
 
 if __name__ == '__main__':
-    playerStandings()
+    swissPairings()
 #
 # select p.player_id as id, p.player_name as name, count(case when m.winner_id = p.player_id then 1 end) as wins, count(m.match_id) as matches
 # from players as p, matches as m
