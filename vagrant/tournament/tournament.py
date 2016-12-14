@@ -128,9 +128,11 @@ def swissPairings():
      count(case when m.winner_id = p.player_id then 1 end) as wins
      from players as p left join matches as m
      on p.player_id = m.winner_id or p.player_id = m.loser_id
-     group by p.player_id order by wins) as subq2 
+     group by p.player_id order by wins) as subq2
      where subq1.player_id < subq2.player_id and
-     subq1.wins = subq2.wins""")
+     subq1.wins = subq2.wins and (select count(*) as c from matches as m where (m.winner_id = subq1.player_id and
+     m.loser_id = subq2.player_id) or (m.winner_id = subq2.player_id and
+     m.loser_id = subq1.player_id)) = 0""")
     ans = c.fetchall()
     c.e
     DB.commit()
