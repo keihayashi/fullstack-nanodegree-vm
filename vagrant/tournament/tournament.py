@@ -69,7 +69,9 @@ def playerStandings():
     DB = connect()
     c = DB.cursor()
     c.execute(
-    """select p.player_id as id, p.player_name as name, count(case when m.winner_id = p.player_id then 1 end) as wins, count(m.match_id) as matches
+    """select p.player_id as id, p.player_name as name,
+    count(case when m.winner_id = p.player_id then 1 end) as wins,
+    count(m.match_id) as matches
     from players as p left join matches as m
     on p.player_id = m.winner_id or p.player_id = m.loser_id
     group by p.player_id order by wins desc""")
@@ -110,6 +112,8 @@ def swissPairings():
     """
     DB = connect()
     c = DB.cursor()
+    # subq1 and subq2 are same.
+    # subq3 is used to delete pairings exists in matches.
     c.execute(
     """select subq1.player_id as id1, subq1.player_name as name1,
      subq2.player_id as id2, subq2.player_name as name2
@@ -124,7 +128,8 @@ def swissPairings():
      on p.player_id = m.winner_id or p.player_id = m.loser_id
      group by p.player_id order by wins) as subq2
      where subq1.player_id < subq2.player_id and
-     subq1.wins = subq2.wins and (select count(*) as c from matches as m where (m.winner_id = subq1.player_id and
+     subq1.wins = subq2.wins and (select count(*) as c from matches as m
+     where (m.winner_id = subq1.player_id and
      m.loser_id = subq2.player_id) or (m.winner_id = subq2.player_id and
      m.loser_id = subq1.player_id)) = 0""")
     pairings = c.fetchall()
