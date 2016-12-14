@@ -108,12 +108,6 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-    # standing = playerStandings()
-    # for i in range(len(standing)):
-    #     for j in range(len(standing[0])):
-    #         print standing[i][j],
-    #     print
-
     DB = connect()
     c = DB.cursor()
     c.execute(
@@ -133,16 +127,20 @@ def swissPairings():
      subq1.wins = subq2.wins and (select count(*) as c from matches as m where (m.winner_id = subq1.player_id and
      m.loser_id = subq2.player_id) or (m.winner_id = subq2.player_id and
      m.loser_id = subq1.player_id)) = 0""")
-    ans = c.fetchall()
-    c.e
+    pairings = c.fetchall()
     DB.commit()
     DB.close()
-    return ans
+    del_pair = []
+    players_dict = {}
 
-if __name__ == '__main__':
-    swissPairings()
-#
-# select p.player_id as id, p.player_name as name, count(case when m.winner_id = p.player_id then 1 end) as wins, count(m.match_id) as matches
-# from players as p, matches as m
-# where p.player_id = m.winner_id or p.player_id = m.loser_id
-# group by p.player_id order by wins desc;
+    for i in range(len(pairings)):
+        if pairings[i][0] in players_dict or pairings[i][2] in players_dict:
+            del_pair.append(i)
+        else:
+            players_dict[pairings[i][0]] = 1
+            players_dict[pairings[i][2]] = 1
+
+    for i in reversed(del_pair):
+        del pairings[i]
+
+    return pairings
