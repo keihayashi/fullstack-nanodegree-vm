@@ -18,7 +18,7 @@ def connect(database_name="tournament"):
 def deleteMatches():
     """Remove all the match records from the database."""
     DB, c = connect()
-    c.execute("delete from matches")
+    c.execute("truncate table matches")
     DB.commit()
     DB.close()
 
@@ -47,9 +47,8 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    cur_num = countPlayers()
     DB, c = connect()
-    c.execute("insert into players values (%s, %s)", (cur_num + 1, name))
+    c.execute("insert into players values (default, %s)", (name,))
     DB.commit()
     DB.close()
 
@@ -87,9 +86,7 @@ def reportMatch(winner, loser):
       loser:  the id number of the player who lost
     """
     DB, c = connect()
-    c.execute("select count(match_id) from matches")
-    match_num = c.fetchone()[0]
-    c.execute("insert into matches values (%s,%s,%s)", (match_num + 1, winner, loser))
+    c.execute("insert into matches values (default,%s,%s)", (winner, loser))
     DB.commit()
     DB.close()
 
