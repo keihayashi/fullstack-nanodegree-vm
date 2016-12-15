@@ -100,26 +100,17 @@ def swissPairings():
         name2: the second player's name
     """
     DB, c = connect()
-    # subq1 and subq2 are same.
-    # subq3 is used to delete pairings exists in matches.
     c.execute(
-    """select subq1.player_id as id1, subq1.player_name as name1,
-     subq2.player_id as id2, subq2.player_name as name2
-     from (select p.player_id as player_id, p.player_name as player_name,
-     count(case when m.winner_id = p.player_id then 1 end) as wins
-     from players as p left join matches as m
-     on p.player_id = m.winner_id or p.player_id = m.loser_id
-     group by p.player_id order by wins) as subq1,
-     (select p.player_id as player_id, p.player_name as player_name,
-     count(case when m.winner_id = p.player_id then 1 end) as wins
-     from players as p left join matches as m
-     on p.player_id = m.winner_id or p.player_id = m.loser_id
-     group by p.player_id order by wins) as subq2
-     where subq1.player_id < subq2.player_id and
-     subq1.wins = subq2.wins and (select count(*) as c from matches as m
-     where (m.winner_id = subq1.player_id and
-     m.loser_id = subq2.player_id) or (m.winner_id = subq2.player_id and
-     m.loser_id = subq1.player_id)) = 0""")
+    """select standing1.id as id1, standing1.name as name1,
+     standing2.id as id2, standing2.name as name2
+     from standings as standing1,
+     standings as standing2
+     where standing1.id < standing2.id and
+     standing1.wins = standing2.wins and
+     (select count(*) as c from matches as m
+     where (m.winner_id = standing1.id and
+     m.loser_id = standing2.id) or (m.winner_id = standing2.id and
+     m.loser_id = standing1.id)) = 0""")
     pairings = c.fetchall()
     DB.commit()
     DB.close()
