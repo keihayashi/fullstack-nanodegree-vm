@@ -15,6 +15,7 @@ def connect(database_name="tournament"):
     except:
         print("Could not set up connection to the database.")
 
+
 def deleteMatches():
     """Remove all the match records from the database."""
     DB, c = connect()
@@ -22,12 +23,14 @@ def deleteMatches():
     DB.commit()
     DB.close()
 
+
 def deletePlayers():
     """Remove all the player records from the database."""
     DB, c = connect()
     c.execute("delete from players")
     DB.commit()
     DB.close()
+
 
 def countPlayers():
     """Returns the number of players currently registered."""
@@ -37,6 +40,7 @@ def countPlayers():
     DB.commit()
     DB.close()
     return ans[0]
+
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -52,11 +56,12 @@ def registerPlayer(name):
     DB.commit()
     DB.close()
 
+
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
 
-    The first entry in the list should be the player in first place, or a player
-    tied for first place if there is currently a tie.
+    The first entry in the list should be the player in first place,
+    or a player tied for first place if there is currently a tie.
 
     Returns:
       A list of tuples, each of which contains (id, name, wins, matches):
@@ -72,6 +77,7 @@ def playerStandings():
     DB.close()
     return ans
 
+
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
 
@@ -83,6 +89,7 @@ def reportMatch(winner, loser):
     c.execute("insert into matches values (default,%s,%s)", (winner, loser))
     DB.commit()
     DB.close()
+
 
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -100,8 +107,7 @@ def swissPairings():
         name2: the second player's name
     """
     DB, c = connect()
-    c.execute(
-    """select standing1.id as id1, standing1.name as name1,
+    c.execute("""select standing1.id as id1, standing1.name as name1,
      standing2.id as id2, standing2.name as name2
      from standings as standing1,
      standings as standing2
