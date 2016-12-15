@@ -9,7 +9,7 @@ It is assumed that the number of players is even.
 1. Install Vagrant and VirtualBox. Use **vagrant up** and **vagrant ssh** command to launch the vagrant VM.
 2. Move to /vagrant/tournament folder. Set up database by **psql -f filename** command. You can check the tournament.py works by running the test program as follows.  
 ```
-$ psql -f tournament.sql # read commands from the file
+$ psql -f tournament.sql # read and run commands from the file
 $ python tournament_test.py # run the test file
 ```
 3. You can access the database of this project using PostgreSQL. Use **psql** command as follows.

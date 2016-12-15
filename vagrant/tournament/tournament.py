@@ -66,13 +66,7 @@ def playerStandings():
         matches: the number of matches the player has played
     """
     DB, c = connect()
-    c.execute(
-    """select p.player_id as id, p.player_name as name,
-    count(case when m.winner_id = p.player_id then 1 end) as wins,
-    count(m.match_id) as matches
-    from players as p left join matches as m
-    on p.player_id = m.winner_id or p.player_id = m.loser_id
-    group by p.player_id order by wins desc""")
+    c.execute("select * from standings order by wins desc")
     ans = c.fetchall()
     DB.commit()
     DB.close()
